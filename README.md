@@ -102,7 +102,7 @@ Basic liveness + DB connectivity check.
 
 ## Stats Output
 
-!![alt text](stats_screenshots.png)(stats_screenshots)
+!![alt text](stats_screenshots.png)
 
 ## Project Structure
 linkstat/
