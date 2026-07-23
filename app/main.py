@@ -77,7 +77,7 @@ def get_stats(short_code: str, db: Session = Depends(get_db)):
     url_entry = db.query(models.URL).filter(models.URL.short_code == short_code).first()
 
     if not url_entry:
-        return HTTPException(status_code=404, detail="Short URL not found")
+        raise HTTPException(status_code=404, detail="Short URL not found")
     
     total_clicks = db.query(func.count(models.Click.id)).filter(
         models.Click.url_id == url_entry.id
@@ -119,7 +119,7 @@ def redirect_to_original(short_code: str, request: Request, db: Session = Depend
 
     new_click = models.Click(
         url_id=url_entry.id,
-        referrer=request.headers.get("referrer")
+        referrer=request.headers.get("referer")
     )
     db.add(new_click)
     db.commit()
