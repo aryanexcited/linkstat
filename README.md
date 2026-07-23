@@ -1,130 +1,250 @@
-# linkstat
+# LinkStat
 
-A URL shortener with real click analytics — not just a counter, but a time-series breakdown of traffic per link, backed by a proper relational schema.
+<p align="center">
 
-**Live demo:** https://linkstat-api.onrender.com/docs
+# 🔗 LinkStat
 
-## Features
+A production-ready URL shortening service built with **FastAPI**, **PostgreSQL**, and **SQLAlchemy**.  
+LinkStat supports custom slugs, click analytics with a 7-day historical breakdown, Docker-based deployment, automated testing with Pytest, and Continuous Integration using GitHub Actions.
 
-- Shorten any URL via base62-encoded auto-increment IDs (collision-free by construction)
-- Optional custom slugs (3–20 chars, alphanumeric + hyphen/underscore, with reserved-word protection)
-- Every redirect logs a click event (timestamp + referrer) to a separate `clicks` table
-- `/stats/{short_code}` aggregates total clicks and a zero-filled 7-day time series — built for charting, not just a raw count
-- Fully containerized: API + PostgreSQL run together via Docker Compose
-- Schema-versioned with Alembic migrations
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-blue)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)
+![Pytest](https://img.shields.io/badge/Tests-10%20Passing-brightgreen)
+![CI](https://github.com/aryanexcited/linkstat/actions/workflows/ci.yml/badge.svg)
 
-## Tech Stack
+</p>
 
-FastAPI · PostgreSQL · SQLAlchemy · Alembic · Docker · Docker Compose · deployed on Render
+---
 
-## Architecture
+## Live Demo
 
-**`urls`** — id, short_code (unique), original_url, created_at, user_id (nullable, for future auth)
-**`clicks`** — id, url_id (FK → urls), clicked_at, referrer (nullable)
+**API**
 
-Click logging and stats aggregation are separated into their own table specifically so analytics can scale beyond a single counter column — `/stats` does a real `GROUP BY` query against `clicks`, not a cached number.
+https://linkstat-api.onrender.com
 
-## Getting Started (local)
+**Interactive Docs**
 
-**Prerequisites:** Docker + Docker Compose
+https://linkstat-api.onrender.com/docs
 
-1. Clone the repo:
+---
+
+# Preview
+
+<p align="center">
+<img src="assets/hero.png" width="900">
+</p>
+
+---
+
+# Features
+
+- Collision-free Base62 short URLs
+- Custom slugs
+- Click analytics
+- Seven-day traffic history
+- Redirect tracking
+- Dockerized deployment
+- PostgreSQL persistence
+- Alembic migrations
+- Automated testing
+- Continuous Integration
+
+---
+
+# Tech Stack
+
+| Category | Technology |
+|-----------|------------|
+| Backend | FastAPI |
+| Database | PostgreSQL (Neon) |
+| ORM | SQLAlchemy |
+| Migrations | Alembic |
+| Validation | Pydantic |
+| Testing | Pytest |
+| CI/CD | GitHub Actions |
+| Containerization | Docker |
+| Deployment | Render |
+
+---
+
+# Architecture
+
+```
+                Client
+                   │
+                   ▼
+             FastAPI Server
+          ┌────────┴────────┐
+          │                 │
+          ▼                 ▼
+   URL Shortener      Analytics
+          │                 │
+          └────────┬────────┘
+                   ▼
+             PostgreSQL
+         ┌─────────┴─────────┐
+         │                   │
+        urls              clicks
+```
+
+---
+
+# Database Design
+
+### urls
+
+| Column | Description |
+|---------|-------------|
+| id | Primary Key |
+| short_code | Unique Base62 Code |
+| original_url | Original URL |
+| created_at | Timestamp |
+| user_id | Reserved for authentication |
+
+### clicks
+
+| Column | Description |
+|---------|-------------|
+| id | Primary Key |
+| url_id | Foreign Key |
+| clicked_at | Timestamp |
+| referrer | Optional HTTP Referer |
+
+The analytics system stores every click separately instead of maintaining a single counter, allowing historical traffic analysis and future reporting features.
+
+---
+
+# API Preview
+
+## Swagger UI
+
+<p align="center">
+<img src="assets/swagger.png" width="900">
+</p>
+
+---
+
+## Analytics
+
+<p align="center">
+<img src="assets/analytics.png" width="900">
+</p>
+
+---
+
+# Local Setup
+
+## Clone
+
 ```bash
-   git clone https://github.com/aryanexcited/linkstat.git
-   cd linkstat
+git clone https://github.com/aryanexcited/linkstat.git
+cd linkstat
 ```
 
-2. Create a `.env` file in the project root:
-DATABASE_URL=postgresql://postgres:yourpassword@localhost:5433/postgres
+## Configure
 
-3. Update `docker-compose.yml`'s `POSTGRES_PASSWORD` to match, then start everything:
+Create a `.env` file.
+
+```env
+DATABASE_URL=postgresql://postgres:password@localhost:5433/postgres
+```
+
+## Build
+
 ```bash
-   docker compose up -d --build
+docker compose up --build
 ```
 
-4. Run database migrations:
+## Run migrations
+
 ```bash
-   alembic upgrade head
+alembic upgrade head
 ```
 
-5. The API is now running at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
+Open
 
-## API Endpoints
-
-### `POST /shorten`
-Create a short URL, optionally with a custom slug.
-
-**Request:**
-```json
-{
-  "original_url": "https://www.anthropic.com",
-  "custom_slug": "anthropic"
-}
 ```
-*(`custom_slug` is optional — omit it for an auto-generated base62 code)*
-
-**Response (201):**
-```json
-{
-  "short_code": "anthropic",
-  "original_url": "https://www.anthropic.com/",
-  "short_url": "https://linkstat-api.onrender.com/anthropic",
-  "created_at": "2026-06-21T15:34:11.381745Z"
-}
+http://localhost:8000/docs
 ```
 
-### `GET /{short_code}`
-Redirects (302) to the original URL and logs a click event.
+---
 
-### `GET /stats/{short_code}`
-Returns total clicks and a 7-day daily breakdown.
+# Running Tests
 
-**Response:**
-```json
-{
-  "short_code": "1",
-  "original_url": "https://www.anthropic.com/",
-  "total_clicks": 4,
-  "clicks_last_7_days": [
-    {"date": "2026-06-15", "clicks": 0},
-    {"date": "2026-06-16", "clicks": 0},
-    {"date": "2026-06-17", "clicks": 0},
-    {"date": "2026-06-18", "clicks": 0},
-    {"date": "2026-06-19", "clicks": 0},
-    {"date": "2026-06-20", "clicks": 0},
-    {"date": "2026-06-21", "clicks": 4}
-  ]
-}
+Run all automated tests
+
+```bash
+pytest -v
 ```
 
-### `GET /health`
-Basic liveness + DB connectivity check.
+Current coverage includes:
 
-## Stats Output
+- Health endpoint
+- URL shortening
+- Redirects
+- Validation
+- Error handling
+- Analytics
 
-!![alt text](stats_screenshots.png)
+---
 
-## Project Structure
+# Continuous Integration
+
+Every push automatically:
+
+- Installs dependencies
+- Runs all Pytest tests
+- Reports build status
+
+<p align="center">
+<img src="assets/ci.png" width="900">
+</p>
+
+---
+
+# Project Structure
+
+```
 linkstat/
-
+│
 ├── app/
-
-│   ├── main.py        # routes
-
-│   ├── models.py       # SQLAlchemy models
-
-│   ├── schemas.py       # Pydantic request/response schemas
-
-│   ├── database.py      # DB engine/session setup
-
-│   ├── config.py        # env-based settings
-
-│   └── utils.py         # base62 encoder
-
-├── alembic/             # migration history
-
+│   ├── main.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── database.py
+│   ├── config.py
+│   └── utils.py
+│
+├── tests/
+│
+├── alembic/
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── keep-alive.yml
+│
 ├── Dockerfile
-
 ├── docker-compose.yml
+├── requirements.txt
+└── README.md
+```
 
-└── requirements.txt
+---
+
+# Future Improvements
+
+- User authentication
+- QR code generation
+- Link expiration
+- Rate limiting
+- Redis caching
+- Custom domains
+
+---
+
+# License
+
+MIT License
