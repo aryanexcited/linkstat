@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkStat API</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>LinkStat API</h1>
+
+        <p class="subtitle">
+            Production-grade URL shortening service with click analytics, custom slugs, and REST APIs.
+        </p>
+
+        <div class="status">
+            <span class="dot"></span>
+            Online
+        </div>
+
+        <div class="version">
+            Version <strong>v1.0.0</strong>
+        </div>
+
+        <div class="features">
+
+            <div class="feature-card">
+                <h3>URL Shortening</h3>
+                <p>Generate short, shareable links.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Analytics</h3>
+                <p>Track clicks with daily statistics.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Custom Slugs</h3>
+                <p>Create memorable branded URLs.</p>
+            </div>
+
+        </div>
+
+        <div class="buttons">
+
+            <a href="/docs" class="btn">
+                View API Documentation
+            </a>
+
+            <a href="/health" class="btn">
+                API Health Status
+            </a>
+
+            <a href="https://github.com/aryanexcited/linkstat" target="_blank" class="btn secondary">
+                GitHub Repository
+            </a>
+
+        </div>
+
+        <div class="tech">
+
+            <span>FastAPI</span>
+            <span>PostgreSQL</span>
+            <span>SQLAlchemy</span>
+            <span>Docker</span>
+            <span>Render</span>
+
+        </div>
+        <footer>
+        
+            <br><br>
+            © 2026 Aryan Khatri
+        
+        </footer>
+    </div>
+</body>
+</html>

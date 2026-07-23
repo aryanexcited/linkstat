@@ -1,5 +1,7 @@
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text, func
 from datetime import datetime, timedelta, timezone
@@ -7,12 +9,33 @@ from app.database import get_db
 from app import models, schemas
 from app.utils import encode_base62
 
-app = FastAPI(title="linkstat")
+app = FastAPI(
+    title="LinkStat API",
+    description="Production-grade URL shortening and analytics service.",
+    version="1.0.0",
+)
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-@app.get("/health")
+templates = Jinja2Templates(directory="app/templates")
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+async def home(request: Request):
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request}
+    )
+
+@app.get("/health", tags=["System"])
 def health(db: Session = Depends(get_db)):
     db.execute(text("SELECT 1"))
-    return {"status": "ok", "db": "connected"}
+
+    return {
+        "status": "healthy",
+        "database": "connected",
+        "service": "LinkStat API",
+        "version": "1.0.0",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
 
 @app.post("/shorten", response_model=schemas.URLResponse, status_code=201)
 def shorten_url(payload: schemas.URLCreate, request: Request, db: Session = Depends(get_db)):
