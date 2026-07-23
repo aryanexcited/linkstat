@@ -1,11 +1,10 @@
-# LinkStat
+<h1 align="center">🔗 LinkStat</h1>
 
 <p align="center">
+A production-ready URL shortening service built with <b>FastAPI</b>, <b>PostgreSQL</b>, and <b>SQLAlchemy</b>. It supports custom slugs, click analytics with a 7-day history, is Dockerized, deployed on Render with Neon PostgreSQL, and includes automated testing with Pytest and GitHub Actions CI.
+</p>
 
-# 🔗 LinkStat
-
-A production-ready URL shortening service built with **FastAPI**, **PostgreSQL**, and **SQLAlchemy**.  
-LinkStat supports custom slugs, click analytics with a 7-day historical breakdown, Docker-based deployment, automated testing with Pytest, and Continuous Integration using GitHub Actions.
+<p align="center">
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688)
@@ -20,13 +19,8 @@ LinkStat supports custom slugs, click analytics with a 7-day historical breakdow
 
 ## Live Demo
 
-**API**
-
-https://linkstat-api.onrender.com
-
-**Interactive Docs**
-
-https://linkstat-api.onrender.com/docs
+- **API:** https://linkstat-api.onrender.com
+- **Swagger Docs:** https://linkstat-api.onrender.com/docs
 
 ---
 
@@ -40,7 +34,7 @@ https://linkstat-api.onrender.com/docs
 
 # Features
 
-- Collision-free Base62 short URLs
+- Base62 URL shortening with collision detection
 - Custom slugs
 - Click analytics
 - Seven-day traffic history
